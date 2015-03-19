@@ -11,7 +11,6 @@ from gviz_data_table import Table
 from google.appengine.api import memcache
 from google.appengine.ext.webapp.template import render
 
-
 CLIENT_SECRETS = os.path.join(os.path.dirname(__file__), 'client_secrets.json')
 SCOPES = [
     'https://www.googleapis.com/auth/bigquery'
@@ -51,6 +50,53 @@ class MainPage(webapp2.RequestHandler):
             return None
         
     #------------------ Country-----------------------------    
+    def _CountryLine(self, bqCountryLine):
+        # get data from query
+        logging.info(bqCountryLine)
+        tabCountryLine = Table()
+        Date = bqCountryLine["schema"]["fields"][0]["name"]
+        Country = bqCountryLine["schema"]["fields"][1]["name"]
+        Impression = bqCountryLine["schema"]["fields"][2]["name"]
+        Clicks = bqCountryLine["schema"]["fields"][3]["name"]
+        CTR = bqCountryLine["schema"]["fields"][4]["name"]
+        AvgPos = bqCountryLine["schema"]["fields"][5]["name"]
+        CPC = bqCountryLine["schema"]["fields"][6]["name"]
+        Costs = bqCountryLine["schema"]["fields"][7]["name"]
+        ConvAdw = bqCountryLine["schema"]["fields"][8]["name"]
+        Sales = bqCountryLine["schema"]["fields"][9]["name"]
+        Optin = bqCountryLine["schema"]["fields"][10]["name"]
+        CVRSales = bqCountryLine["schema"]["fields"][11]["name"]
+        CVROptin = bqCountryLine["schema"]["fields"][12]["name"]
+        CA = bqCountryLine["schema"]["fields"][13]["name"]
+        TxDistri = bqCountryLine["schema"]["fields"][14]["name"]
+        AvgBasket = bqCountryLine["schema"]["fields"][15]["name"]
+        
+        #create tab and attribute column with data
+        tabCountryLine.add_column(Date, unicode, Date) 
+        tabCountryLine.add_column(Impression, float, Impression)
+        #tabCountryLine.add_column(Clicks, float, Clicks)
+        #tabCountryLine.add_column(CTR, float, CTR)
+        #tabCountryLine.add_column(AvgPos, float, AvgPos)
+        #tabCountryLine.add_column(CPC, float, CPC)
+        #tabCountryLine.add_column(Costs, float, Costs)
+        #tabCountryLine.add_column(ConvAdw, float, ConvAdw)
+        #tabCountryLine.add_column(Sales, float, Sales)
+        #tabCountryLine.add_column(Optin, float, Optin)
+        #tabCountryLine.add_column(CVRSales, float, CVRSales)
+        #tabCountryLine.add_column(CVROptin, float, CVROptin)
+        #tabCountryLine.add_column(CA, float, CA)
+        #tabCountryLine.add_column(TxDistri, float, TxDistri)
+        #tabCountryLine.add_column(AvgBasket, float, AvgBasket)
+        
+        #loop on all row to get data and shaped for chart
+        for row in bqCountryLine["rows"]:            
+            tabCountryLine.append([row["f"][0]["v"], MainPage.to_float(row["f"][2]["v"])])
+        logging.info("----End Data CountryLine")
+        logging.info(tabCountryLine)
+        return encode(tabCountryLine)
+    
+        #---------------------------
+    
     def _CountryTab(self, bqCountryTab):
         # get data from query
         logging.info(bqCountryTab)
@@ -91,7 +137,7 @@ class MainPage(webapp2.RequestHandler):
         #loop on all row to get data and shaped for chart
         for row in bqCountryTab["rows"]:            
             tabCountryTab.append([row["f"][0]["v"], MainPage.to_float(row["f"][1]["v"]), MainPage.to_float(row["f"][2]["v"]), MainPage.to_float(row["f"][3]["v"]), MainPage.to_float(row["f"][4]["v"]), MainPage.to_float(row["f"][5]["v"]), MainPage.to_float(row["f"][6]["v"]), MainPage.to_float(row["f"][7]["v"]), MainPage.to_float(row["f"][8]["v"]), MainPage.to_float(row["f"][9]["v"]), MainPage.to_float(row["f"][10]["v"]), MainPage.to_float(row["f"][11]["v"]), MainPage.to_float(row["f"][12]["v"]), MainPage.to_float(row["f"][13]["v"]), MainPage.to_float(row["f"][14]["v"])])
-        logging.info("----End Data")
+        logging.info("----End Data CountryTab")
         logging.info(tabCountryTab)
         return encode(tabCountryTab)
     #-----------------End Country----------------------------------------
@@ -101,6 +147,7 @@ class MainPage(webapp2.RequestHandler):
         data = mem.get('Alldata')
         bq = bqclient.BigQueryClient(decorator)
         
+        valCountryLine = self._CountryLine(bq.Query(QRCountryLine, BILLING_PROJECT_ID))
         valCountryTab = self._CountryTab(bq.Query(QRCountryTab, BILLING_PROJECT_ID))
         
         data = ({'CountryTab': valCountryTab,'QrCountryTab' : QRCountryTab})

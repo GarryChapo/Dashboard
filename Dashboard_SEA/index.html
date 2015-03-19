@@ -28,17 +28,25 @@
   
   <script type='text/javascript' src='https://www.google.com/jsapi'></script>
   <script type='text/javascript'>
+
+
 	// Load the Visualization API and the controls package.
      google.load('visualization', '1', {'packages':['table']});
-     google.setOnLoadCallback(drawCountryTab);
+     google.setOnLoadCallback(dashboard);
 
+	 //CountryLineData = {% autoescape off %}{{ CountryLine }}{% endautoescape %}
      CountryTabData = {% autoescape off %}{{ CountryTab }}{% endautoescape %}
 
-     function drawCountryTab() {
+     function dashboard() {
 	 // Create the data table.
-       if (! CountryTabData) return;
-          
-	 // Instantiate and draw our chart, passing in some options.
+      
+      //-----------------------------Country--------------------------------------------    
+	 // Country Line
+       //var dataCountryLine = new google.visualization.DataTable(CountryLineData);       
+       //var tabCountryLine = new google.charts.Line(document.getElementById('material'));
+       //tabCountryLine.draw(dataCountryLine);
+
+	 // Country Tab
        var dataCountryTab = new google.visualization.DataTable(CountryTabData);       
        var tabCountryTab = new google.visualization.Table(document.getElementById('table_div'));
        tabCountryTab.draw(dataCountryTab);
@@ -62,12 +70,11 @@
 		<div class="page-header" style="text-align:center">
 			<h1>Country</h1>
 		</div>
-		<!--Div that will hold the dashboard-->
-			<p><div id="table_div"></div></p>
+		
+		<!--Div that will hold the dashboard-->	
+		<div id="table_div"></div>
 	</div>
-    
-    
-    
+ 
     
         <!-- Bootstrap core JavaScript
     ================================================== -->
