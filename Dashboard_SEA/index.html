@@ -7,63 +7,138 @@
   <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
   <meta name="Dashboard for analyze results of SEA account" content="">
   <meta name="NetBooster" content="">
-      
+
+  <!-- Bootstrap CSS -->
+  <link href="/css/bootstrap.css" rel="stylesheet">
   <!-- Bootstrap core CSS -->
   <link href="/css/bootstrap.min.css" rel="stylesheet">
   <!-- Bootstrap theme -->
   <link href="/css/bootstrap-theme.min.css" rel="stylesheet">
-
   <!-- Custom styles for this template -->
   <link href="/css/theme.css" rel="stylesheet">
+  <!-- Boorstrap Select -->
+  <link href="/css/bootstrap-select.css" rel="stylesheet">
+  <link href="/css/bootstrap-select.min.css" rel="stylesheet">
   
-    <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
+    
+  <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
   <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
   <script src="/assets/js/ie-emulation-modes-warning.js"></script>
 
   <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
   <!--[if lt IE 9]>
-    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+  <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+  <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
   <![endif]-->
   
   <script type='text/javascript' src='https://www.google.com/jsapi'></script>
   <script type='text/javascript'>
-
-
 	// Load the Visualization API and the controls package.
-     google.load('visualization', '1', {'packages':['table']});
+	 google.load('visualization', '1.1', {'packages':['table','corechart']});
      google.setOnLoadCallback(dashboard);
 
-	 //CountryLineData = {% autoescape off %}{{ CountryLine }}{% endautoescape %}
+	 CountryLineData = {% autoescape off %}{{ CountryLine }}{% endautoescape %}
      CountryTabData = {% autoescape off %}{{ CountryTab }}{% endautoescape %}
 
-     function dashboard() {
-	 // Create the data table.
-      
-      //-----------------------------Country--------------------------------------------    
-	 // Country Line
-       //var dataCountryLine = new google.visualization.DataTable(CountryLineData);       
-       //var tabCountryLine = new google.charts.Line(document.getElementById('material'));
-       //tabCountryLine.draw(dataCountryLine);
-
-	 // Country Tab
-       var dataCountryTab = new google.visualization.DataTable(CountryTabData);       
-       var tabCountryTab = new google.visualization.Table(document.getElementById('table_div'));
-       tabCountryTab.draw(dataCountryTab);
+     function dashboard() { 
+	      // Variable pour les formats des valeurs     
+	      	var FormatSpace = new google.visualization.NumberFormat({negativeColor: 'red', negativeParens: true, pattern: '###,###'});      
+	      	var FormatPourcent = new google.visualization.NumberFormat({negativeColor: 'red', negativeParens: true, suffix: '%'});
+	       	var FormatMoney = new google.visualization.NumberFormat({negativeColor: 'red', negativeParens: true, pattern: '###,###.##€'});
+	        var FormatDate = new google.visualization.DateFormat({pattern: 'dd/MM/yy'});
+	            	            
+	      //-----------------------------Country--------------------------------------------    	 
+		 // Country Line
+	      	var dataCountryLine = new google.visualization.DataTable(CountryLineData);
+ 	       	var classicOptions = {
+	      		legend:'none',
+	      		series: {
+	      			0: {color: '#EA4498'} //1er KPI
+	      			//1: {color: '#373A36'} //2eme KPI
+	      			//2: {color: '#E399BF'} //1er KPI Compare
+	      			//3: {color: '#B1B1B1'} //2eme KPI Compare
+	      			}
+	      		};
+	       	var tabCountryLine = new google.visualization.LineChart(document.getElementById('classic'));
+	       	tabCountryLine.draw(dataCountryLine, classicOptions);
+	
+		 // Country Tab
+	       	var dataCountryTab = new google.visualization.DataTable(CountryTabData);       
+	       	var tabCountryTab = new google.visualization.Table(document.getElementById('table_div'));
+	       //Format les colonnes du tableau
+		   	FormatSpace.format(dataCountryTab, 1);
+		  	FormatSpace.format(dataCountryTab, 2);
+		  	FormatPourcent.format(dataCountryTab, 3);
+		  	FormatMoney.format(dataCountryTab, 5);
+		  	FormatMoney.format(dataCountryTab, 6);
+		  	FormatSpace.format(dataCountryTab, 7);
+		  	FormatSpace.format(dataCountryTab, 8);
+		  	FormatSpace.format(dataCountryTab, 9);
+		  	FormatPourcent.format(dataCountryTab, 10);
+		  	FormatPourcent.format(dataCountryTab, 11);
+		  	FormatMoney.format(dataCountryTab, 12);
+		  	FormatPourcent.format(dataCountryTab, 13);
+		  	FormatMoney.format(dataCountryTab, 14);
+		  	
+		   tabCountryTab.draw(dataCountryTab, {allowHtml: true, showRowNumber: true});   
+		   //---------------------------------------------------------------------------------
     };
+    
+    //------------------------------Function pour les filtres---------------------------------
+    //Changement de date dans le select periode
+    function getSelectPeriode(){    
+	    select = document.getElementById("SelectPeriode");
+		valeur = select.options[select.selectedIndex].value;
+		texte = select.options[select.selectedIndex].text;
+		document.getElementById('ShowPeriode').value = valeur;
+    };
+    
+    //Modifie la form du Custom pour ajouter le calendar
+    function formCustom(){
+    
+    };
+    
   </script>
+  
 </head>
 
 <body role="document">
-    <!-- Fixed navbar -->
-    <nav class="navbar navbar-inverse navbar-fixed-top" style="height: 91px;">
-      <div class="container" style="padding-top: 5px">       
+    <!-- Header -->
+    <nav class="navbar navbar-inverse navbar-fixed-top" style="height: 91px;margin-bottom:0px">
+      <div class="container" style="padding-top: 5px;padding-bottom:5px;">       
         <div id="navbar" class="navbar-collapse collapse">
          <img class="left" src="/image/ELCE.png" id="ELCE_logo"/>
          <img class="right" src="/image/NB_Logo.png" id="NB_logo"/>
         </div><!--/.nav-collapse -->
       </div>
-    </nav>
+
+	<div class="jumbotron">
+		<div class="container">
+		<p><form class="form-horizontal" role="form" method="post" action="#">
+			<div class="form-group">
+				<div class="col-xs-1" style="height:34px"><h4>Periode </h4></div>
+				<div class="col-xs-4">
+					<div class="input-group">
+				      <div class="input-group-btn">
+				        <select id="SelectPeriode" class="selectpicker" data-width="120px" onchange="getSelectPeriode();">
+				          <option Selected value="Yesterday">Yesterday</option>
+				          <option value="Last7days">Last 7 days</option>
+				          <option value="Lastweek">Last week</option>
+				          <option value="Lastmonth">Last month</option>
+				          <option data-divider="true"></option>
+				          <option value="Custom" onchange="formCustom();">Custom</option>
+				          
+					    </select>       
+				      </div><!-- End input-group-btn -->
+				      <input type="text" class="form-control" id="ShowPeriode" readonly="true" value="">
+				    </div><!-- End input-group -->
+				</div><!-- End col-xs-5 -->
+			</div><!-- End form-group -->
+	    </form></p>
+		</div><!-- End container -->
+	</div><!-- End jumbotron -->
+    </nav>    
+    
     
    <!-- Content -->
 	<div class="container theme-showcase" role="main"> 
@@ -72,15 +147,30 @@
 		</div>
 		
 		<!--Div that will hold the dashboard-->	
-		<div id="table_div"></div>
-	</div>
- 
+		
+		<div class="row">
+			<div id="classic"></div>
+		</div>
+		
+		<div class="row">
+			<div id="table_div"></div>
+		</div>
+	
+	    <div class="footer">
+	    	<div class="modal-footer">
+	    		<p>Copyright® 2015 by  <a href="http://www.netbooster.com/">NetBooster Group</a>.</p>
+	    	</div>      
+	    </div>
+    </div>
+    
     
         <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
     <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/bootstrap-select.js"></script>
+    <script src="/js/bootstrap-select.min.js"></script>
     <script src="/assets/js/docs.min.js"></script>
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <script src="/assets/js/ie10-viewport-bug-workaround.js"></script>

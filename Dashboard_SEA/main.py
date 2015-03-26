@@ -74,19 +74,6 @@ class MainPage(webapp2.RequestHandler):
         #create tab and attribute column with data
         tabCountryLine.add_column(Date, unicode, Date) 
         tabCountryLine.add_column(Impression, float, Impression)
-        #tabCountryLine.add_column(Clicks, float, Clicks)
-        #tabCountryLine.add_column(CTR, float, CTR)
-        #tabCountryLine.add_column(AvgPos, float, AvgPos)
-        #tabCountryLine.add_column(CPC, float, CPC)
-        #tabCountryLine.add_column(Costs, float, Costs)
-        #tabCountryLine.add_column(ConvAdw, float, ConvAdw)
-        #tabCountryLine.add_column(Sales, float, Sales)
-        #tabCountryLine.add_column(Optin, float, Optin)
-        #tabCountryLine.add_column(CVRSales, float, CVRSales)
-        #tabCountryLine.add_column(CVROptin, float, CVROptin)
-        #tabCountryLine.add_column(CA, float, CA)
-        #tabCountryLine.add_column(TxDistri, float, TxDistri)
-        #tabCountryLine.add_column(AvgBasket, float, AvgBasket)
         
         #loop on all row to get data and shaped for chart
         for row in bqCountryLine["rows"]:            
@@ -144,17 +131,17 @@ class MainPage(webapp2.RequestHandler):
     
     @decorator.oauth_required
     def get(self):
-        data = mem.get('Alldata')
         bq = bqclient.BigQueryClient(decorator)
         
-        valCountryLine = self._CountryLine(bq.Query(QRCountryLine, BILLING_PROJECT_ID))
         valCountryTab = self._CountryTab(bq.Query(QRCountryTab, BILLING_PROJECT_ID))
-        
-        data = ({'CountryTab': valCountryTab,'QrCountryTab' : QRCountryTab})
+        valCountryLine = self._CountryLine(bq.Query(QRCountryLine, BILLING_PROJECT_ID))
+        data = ({'CountryTab': valCountryTab,'QrCountryTab' : QRCountryTab,
+                'CountryLine': valCountryLine,'QrCountryLine' : QRCountryLine})
         mem.set('Alldata', data)
         template = os.path.join(os.path.dirname(__file__), 'index.html')
         self.response.out.write(render(template, data))
-
+                
+    
 application = webapp2.WSGIApplication([
     ('/', MainPage),
     (decorator.callback_path, decorator.callback_handler())
