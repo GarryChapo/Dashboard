@@ -40,6 +40,7 @@ QRCountryTab = SELECTCTTAB + FROMCTTAB + WHERE + GROUPBYCTTAB + ORDERBYCTTAB
 
 mem = memcache.Client()
 
+
 class MainPage(webapp2.RequestHandler):
     
     @staticmethod

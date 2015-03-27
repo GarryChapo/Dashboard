@@ -83,20 +83,143 @@
 		   tabCountryTab.draw(dataCountryTab, {allowHtml: true, showRowNumber: true});   
 		   //---------------------------------------------------------------------------------
     };
+    //----------------------------------------------------------------------------------------
+    //                                Function pour les filtres
+    //----------------------------------------------------------------------------------------
+	    //set date for each periode
+	    function setYesterday(){
+	        var yesterday = new Date();
+	        yesterday.setDate(yesterday.getDate() - 1);
+	        return yesterday;
+	    };
+	    
+	    function setLast7Days(){
+	        var last7days = new Date();
+	        last7days.setDate(last7days.getDate() - 7);
+	        return last7days;
+	    };    
+    	
+    	function setEndWeek(){
+    	    var dimanche = 0;
+    		var endweek = new Date();
+    		    		
+    		while(endweek.getDay() != dimanche) {
+    			endweek.setDate(endweek.getDate() - 1);
+			}
+    		return endweek; 
+    	};
+    	
+    	Date.prototype.setFirstofMonth=function(){				
+		    return new Date(this.getFullYear(), this.getMonth()-1, 1);
+		};
     
-    //------------------------------Function pour les filtres---------------------------------
-    //Changement de date dans le select periode
-    function getSelectPeriode(){    
-	    select = document.getElementById("SelectPeriode");
-		valeur = select.options[select.selectedIndex].value;
-		texte = select.options[select.selectedIndex].text;
-		document.getElementById('ShowPeriode').value = valeur;
-    };
+    	Date.prototype.setEndofMonth=function(){				
+		    return new Date(this.getFullYear(), this.getMonth(), 0);
+		};
     
-    //Modifie la form du Custom pour ajouter le calendar
-    function formCustom(){
-    
-    };
+    //------------------------------------------------
+	    //Right Date format
+	    function getYesterday(){
+			var d1 = setYesterday().getDate(); 
+			var mm = setYesterday().getMonth()+1;
+			var yyyy = setYesterday().getFullYear();
+			if(d1<10){d1="0"+d1} 
+			if(mm<10){mm="0"+mm} 
+			var yesterday = d1+'/'+mm+'/'+yyyy;
+			
+			document.getElementById('ShowPeriode').value = yesterday;
+	    };
+	    
+	    function getLast7Days(){
+	        //yesterday
+			var d1 = setYesterday().getDate(); 
+			var mm = setYesterday().getMonth()+1; 
+			var yyyy = setYesterday().getFullYear();
+			if(d1<10){d1="0"+d1} 
+			if(mm<10){mm="0"+mm} 
+			var yesterday = d1+'/'+mm+'/'+yyyy;
+			
+			//Yesterday - 7
+			var d7 = setLast7Days().getDate(); 
+			var mm = setLast7Days().getMonth()+1; 
+			var yyyy = setLast7Days().getFullYear();
+			if(d7<10){d7="0"+d7}; 
+			if(mm<10){mm="0"+mm}; 
+			var yesterday7 = d7+'/'+mm+'/'+yyyy;
+			var last7day = yesterday7 + ' - ' + yesterday; 
+			
+			document.getElementById('ShowPeriode').value = last7day;
+	    };
+	    
+	    function getLastWeek(){
+			var Dimanche = setEndWeek().getDate();
+			var mm = setEndWeek().getMonth()+1; 
+			var yyyy = setEndWeek().getFullYear();
+			if(Dimanche<10){Dimanche="0"+Dimanche} 
+			if(mm<10){mm="0"+mm} 
+			var Dimanche = Dimanche+'/'+mm+'/'+yyyy;
+			
+			var Lundi = setEndWeek().getDate()-6;
+			var mm = setEndWeek().getMonth()+1; 
+			var yyyy = setEndWeek().getFullYear();
+			if(Lundi<10){Lundi="0"+Lundi} 
+			if(mm<10){mm="0"+mm} 
+			var Lundi = Lundi+'/'+mm+'/'+yyyy;
+			
+			var lastweek = Lundi + ' - ' + Dimanche;
+			document.getElementById('ShowPeriode').value = lastweek;
+	    };
+	    
+	    function getLastMonth(){
+			var dateFirst = new Date().setFirstofMonth();
+			var dFirst = dateFirst.getDate();
+			var mm = dateFirst.getMonth()+1; 
+			var yyyy = dateFirst.getFullYear();
+			if(dFirst<10){dFirst="0"+dFirst} 
+			if(mm<10){mm="0"+mm} 
+			var dFirst = dFirst+'/'+mm+'/'+yyyy;
+			
+			var dateEnd = new Date().setEndofMonth();
+			var dEnd = dateEnd.getDate();
+			var mm = dateEnd.getMonth()+1; 
+			var yyyy = dateEnd.getFullYear();
+			if(dEnd<10){dEnd="0"+dEnd} 
+			if(mm<10){mm="0"+mm} 
+			var dEnd = dEnd+'/'+mm+'/'+yyyy;			
+			
+			var lastmonth = dFirst + ' - ' + dEnd;
+			document.getElementById('ShowPeriode').value = lastmonth;
+	    };
+	    
+    //--------------------------------------------------------------
+	    //Get right periode in terms of periode selected
+	    function getSelectPeriode(){    
+		    //Get the select element
+		    select = document.getElementById("SelectPeriode");
+			valeur = select.options[select.selectedIndex].value;
+			
+			//write the date in input
+			switch(valeur){
+				case "Yesterday":
+					getYesterday();
+					break;
+				case "Last7days":
+					getLast7Days();
+					break;
+				case "Lastweek":
+					getLastWeek();
+					break;
+				case "Lastmonth":
+					getLastMonth();
+					break;
+			};
+	    };
+	    
+	    //Modifie la form du Custom pour ajouter le calendar
+	    function formCustom(){
+	    
+	    };
+    //---------------------END Date--------------------------------------
     
   </script>
   
@@ -121,7 +244,7 @@
 					<div class="input-group">
 				      <div class="input-group-btn">
 				        <select id="SelectPeriode" class="selectpicker" data-width="120px" onchange="getSelectPeriode();">
-				          <option Selected value="Yesterday">Yesterday</option>
+				          <option value="Yesterday" Selected>Yesterday</option>
 				          <option value="Last7days">Last 7 days</option>
 				          <option value="Lastweek">Last week</option>
 				          <option value="Lastmonth">Last month</option>
@@ -130,7 +253,7 @@
 				          
 					    </select>       
 				      </div><!-- End input-group-btn -->
-				      <input type="text" class="form-control" id="ShowPeriode" readonly="true" value="">
+				      <input type="text" class="form-control" id="ShowPeriode" readonly="true" >
 				    </div><!-- End input-group -->
 				</div><!-- End col-xs-5 -->
 			</div><!-- End form-group -->
