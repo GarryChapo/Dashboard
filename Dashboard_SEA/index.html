@@ -7,7 +7,20 @@
   <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
   <meta name="Dashboard for analyze results of SEA account" content="">
   <meta name="NetBooster" content="">
-
+  
+  
+        <!-- Bootstrap core JavaScript
+    ================================================== -->
+  <!-- Placed at the end of the document so the pages load faster -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+  <script src="/js/bootstrap.min.js"></script>
+  <script src="/js/bootstrap-select.js"></script>
+  <script src="/js/bootstrap-select.min.js"></script>
+  <script src="/assets/js/docs.min.js"></script>
+  <script src="/js/bootstrap-datepicker.js"></script>
+  <script src="/js/locales/bootstrap-datepicker.fr.js"></script>
+  <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+  <script src="/assets/js/ie10-viewport-bug-workaround.js"></script>
   <!-- Bootstrap CSS -->
   <link href="/css/bootstrap.css" rel="stylesheet">
   <!-- Bootstrap core CSS -->
@@ -86,140 +99,532 @@
     //----------------------------------------------------------------------------------------
     //                                Function pour les filtres
     //----------------------------------------------------------------------------------------
-	    //set date for each periode
+	    //#####################################################################
+	    //						Set date for each periode
+	    //#####################################################################
 	    function setYesterday(){
-	        var yesterday = new Date();
-	        yesterday.setDate(yesterday.getDate() - 1);
-	        return yesterday;
-	    };
-	    
+	        var dt = new Date();
+	        dt.setDate(dt.getDate() - 1);
+	        return dt;
+	    };	    
 	    function setLast7Days(){
-	        var last7days = new Date();
-	        last7days.setDate(last7days.getDate() - 7);
-	        return last7days;
-	    };    
-    	
+	        var dt = new Date();
+	        dt.setDate(dt.getDate() - 7);
+	        return dt;
+	    };        	
     	function setEndWeek(){
     	    var dimanche = 0;
-    		var endweek = new Date();
-    		    		
-    		while(endweek.getDay() != dimanche) {
-    			endweek.setDate(endweek.getDate() - 1);
+    		var dt = new Date();	
+    		while(dt.getDay() != dimanche) {
+    			dt.setDate(dt.getDate() - 1);
 			}
-    		return endweek; 
-    	};
+    		return dt; 
+    	};    	
     	
+    	//Set for previous month
     	Date.prototype.setFirstofMonth=function(){				
 		    return new Date(this.getFullYear(), this.getMonth()-1, 1);
-		};
-    
+		};    
     	Date.prototype.setEndofMonth=function(){				
 		    return new Date(this.getFullYear(), this.getMonth(), 0);
 		};
-    
-    //------------------------------------------------
-	    //Right Date format
-	    function getYesterday(){
-			var d1 = setYesterday().getDate(); 
+    	//Set for previous month compare
+    	Date.prototype.setFirstofMonthCompare=function(){				
+		    return new Date(this.getFullYear(), this.getMonth()-2, 1);
+		};    
+    	Date.prototype.setEndofMonthCompare=function(){
+		    return new Date(this.getFullYear(), this.getMonth()-1, 0);
+		};
+		//Calcul the previous year for a date
+    	function previousYear(dt){
+			var pYear = dt;
+			var year = pYear.getFullYear();
+			
+			//-1 day to get previous year with right day
+			if(year % 4 == 0 && year % 100 != 0 || year % 400 == 0)
+			 pYear.setDate(pYear.getDate() - 365); //bisextile year
+			
+			else
+			 pYear.setDate(pYear.getDate() - 364); //normal year
+			 
+		    return pYear;		    
+		};
+
+//-------------------------------------Date Periode--------------------------------------------------------------------------
+	    //#####################################################################
+	    //						Final Date format Date Periode
+	    //#####################################################################
+	    function getYesterday(valeurCompare){
+			var dd = setYesterday().getDate(); 
 			var mm = setYesterday().getMonth()+1;
 			var yyyy = setYesterday().getFullYear();
-			if(d1<10){d1="0"+d1} 
+			if(dd<10){dd="0"+dd} 
 			if(mm<10){mm="0"+mm} 
-			var yesterday = d1+'/'+mm+'/'+yyyy;
+			var formatDate = dd+'/'+mm+'/'+yyyy;
 			
-			document.getElementById('ShowPeriode').value = yesterday;
-	    };
-	    
-	    function getLast7Days(){
-	        //yesterday
-			var d1 = setYesterday().getDate(); 
-			var mm = setYesterday().getMonth()+1; 
-			var yyyy = setYesterday().getFullYear();
-			if(d1<10){d1="0"+d1} 
-			if(mm<10){mm="0"+mm} 
-			var yesterday = d1+'/'+mm+'/'+yyyy;
-			
-			//Yesterday - 7
-			var d7 = setLast7Days().getDate(); 
-			var mm = setLast7Days().getMonth()+1; 
-			var yyyy = setLast7Days().getFullYear();
-			if(d7<10){d7="0"+d7}; 
-			if(mm<10){mm="0"+mm}; 
-			var yesterday7 = d7+'/'+mm+'/'+yyyy;
-			var last7day = yesterday7 + ' - ' + yesterday; 
-			
-			document.getElementById('ShowPeriode').value = last7day;
-	    };
-	    
-	    function getLastWeek(){
-			var Dimanche = setEndWeek().getDate();
-			var mm = setEndWeek().getMonth()+1; 
-			var yyyy = setEndWeek().getFullYear();
-			if(Dimanche<10){Dimanche="0"+Dimanche} 
-			if(mm<10){mm="0"+mm} 
-			var Dimanche = Dimanche+'/'+mm+'/'+yyyy;
-			
-			var Lundi = setEndWeek().getDate()-6;
-			var mm = setEndWeek().getMonth()+1; 
-			var yyyy = setEndWeek().getFullYear();
-			if(Lundi<10){Lundi="0"+Lundi} 
-			if(mm<10){mm="0"+mm} 
-			var Lundi = Lundi+'/'+mm+'/'+yyyy;
-			
-			var lastweek = Lundi + ' - ' + Dimanche;
-			document.getElementById('ShowPeriode').value = lastweek;
-	    };
-	    
-	    function getLastMonth(){
-			var dateFirst = new Date().setFirstofMonth();
-			var dFirst = dateFirst.getDate();
-			var mm = dateFirst.getMonth()+1; 
-			var yyyy = dateFirst.getFullYear();
-			if(dFirst<10){dFirst="0"+dFirst} 
-			if(mm<10){mm="0"+mm} 
-			var dFirst = dFirst+'/'+mm+'/'+yyyy;
-			
-			var dateEnd = new Date().setEndofMonth();
-			var dEnd = dateEnd.getDate();
-			var mm = dateEnd.getMonth()+1; 
-			var yyyy = dateEnd.getFullYear();
-			if(dEnd<10){dEnd="0"+dEnd} 
-			if(mm<10){mm="0"+mm} 
-			var dEnd = dEnd+'/'+mm+'/'+yyyy;			
-			
-			var lastmonth = dFirst + ' - ' + dEnd;
-			document.getElementById('ShowPeriode').value = lastmonth;
-	    };
-	    
-    //--------------------------------------------------------------
-	    //Get right periode in terms of periode selected
-	    function getSelectPeriode(){    
-		    //Get the select element
-		    select = document.getElementById("SelectPeriode");
-			valeur = select.options[select.selectedIndex].value;
-			
-			//write the date in input
-			switch(valeur){
-				case "Yesterday":
-					getYesterday();
+			document.getElementById('ShowPeriode').value = formatDate;
+		
+			switch(valeurCompare){
+				case "PvDay":
+					var dday = setYesterday();
+					dday.setDate(dday.getDate() - 1);
+					
+					var dd = dday.getDate();
+					var mm = dday.getMonth()+1;
+					var yyyy = dday.getFullYear();
+					if(dd<10){dd="0"+dd}
+					if(mm<10){mm="0"+mm}
+					var formatDate = dd+'/'+mm+'/'+yyyy;
+					document.getElementById('ShowCompare').value = formatDate;						
 					break;
-				case "Last7days":
-					getLast7Days();
-					break;
-				case "Lastweek":
-					getLastWeek();
-					break;
-				case "Lastmonth":
-					getLastMonth();
+					
+				case "PvYear":			
+					var dd = previousYear(setYesterday()).getDate(); 
+					var mm = previousYear(setYesterday()).getMonth()+1;
+					var yyyy = previousYear(setYesterday()).getFullYear();
+					if(dd<10){dd="0"+dd} 
+					if(mm<10){mm="0"+mm} 
+					var formatDate = dd+'/'+mm+'/'+yyyy;
+					
+					document.getElementById('ShowCompare').value = formatDate;
 					break;
 			};
-	    };
-	    
-	    //Modifie la form du Custom pour ajouter le calendar
-	    function formCustom(){
-	    
-	    };
-    //---------------------END Date--------------------------------------
+	    };	    
+	    function getLast7Days(valeurCompare){
+	        //yesterday
+			var dd = setYesterday().getDate(); 
+			var mm = setYesterday().getMonth()+1;
+			var yyyy = setYesterday().getFullYear();
+			if(dd<10){dd="0"+dd} 
+			if(mm<10){mm="0"+mm} 
+			var formatDateEd = dd+'/'+mm+'/'+yyyy;
+			
+			//Yesterday - 7
+			var dd = setLast7Days().getDate(); 
+			var mm = setLast7Days().getMonth()+1; 
+			var yyyy = setLast7Days().getFullYear();
+			if(dd<10){dd="0"+dd}
+			if(mm<10){mm="0"+mm}
+			var formatDateDb = dd+'/'+mm+'/'+yyyy;
+			
+			var formatDate = formatDateDb + ' - ' + formatDateEd;
+			document.getElementById('ShowPeriode').value = formatDate;
+
+			switch(valeurCompare){
+				case "PvDay":
+					//dday = yesterday - 1
+					var dday = setLast7Days();
+					dday.setDate(dday.getDate() - 1);
+					var dd = dday.getDate();
+					var mm = dday.getMonth()+1;
+					var yyyy = dday.getFullYear();
+					if(dd<10){dd="0"+dd}
+					if(mm<10){mm="0"+mm}
+					var formatDateEd = dd+'/'+mm+'/'+yyyy;
+					
+					//dday-7
+					var dday7 = dday;
+					dday7.setDate(dday.getDate() - 6);
+					
+					var dd = dday7.getDate();
+					var mm = dday7.getMonth()+1;
+					var yyyy = dday7.getFullYear();
+					if(dd<10){dd="0"+dd}
+					if(mm<10){mm="0"+mm}
+					var formatDateDb = dd+'/'+mm+'/'+yyyy;
+								
+					var formatDate = formatDateDb + ' - ' + formatDateEd;
+					document.getElementById('ShowCompare').value = formatDate;						
+					break;
+					
+				case "PvYear":
+					var dd = previousYear(setYesterday()).getDate(); 
+					var mm = previousYear(setYesterday()).getMonth()+1;
+					var yyyy = previousYear(setYesterday()).getFullYear();
+					if(dd<10){dd="0"+dd}
+					if(mm<10){mm="0"+mm} 
+					var formatDateEd = dd+'/'+mm+'/'+yyyy;
+
+					var dd = previousYear(setLast7Days()).getDate(); 
+					var mm = previousYear(setLast7Days()).getMonth()+1;
+					var yyyy = previousYear(setLast7Days()).getFullYear();
+					if(dd<10){dd="0"+dd}
+					if(mm<10){mm="0"+mm} 
+					var formatDateDb = dd+'/'+mm+'/'+yyyy;
+				
+					var formatDate = formatDateDb + ' - ' + formatDateEd;
+					document.getElementById('ShowCompare').value = formatDate;										
+					break;
+			};
+	    };	    
+	    function getLastWeek(valeurCompare){
+			//Dimanche
+			var dd = setEndWeek().getDate();
+			var mm = setEndWeek().getMonth()+1; 
+			var yyyy = setEndWeek().getFullYear();
+			if(dd<10){dd="0"+dd} 
+			if(mm<10){mm="0"+mm} 
+			var formatDateEd = dd+'/'+mm+'/'+yyyy;
+			
+			//Lundi
+			var dd = setEndWeek().getDate()-6;
+			var mm = setEndWeek().getMonth()+1; 
+			var yyyy = setEndWeek().getFullYear();
+			if(dd<10){dd="0"+dd} 
+			if(mm<10){mm="0"+mm} 
+			var formatDateDb = dd+'/'+mm+'/'+yyyy;
+			
+			var formatDate = formatDateDb + ' - ' + formatDateEd;
+			document.getElementById('ShowPeriode').value = formatDate;
+			
+			switch(valeurCompare){
+				case "PvDay":
+					var ddimanche = setEndWeek();
+					ddimanche.setDate(ddimanche.getDate() - 7);
+					
+					var dd = ddimanche.getDate();
+					var mm = ddimanche.getMonth()+1;
+					var yyyy = ddimanche.getFullYear();
+					if(dd<10){dd="0"+dd}
+					if(mm<10){mm="0"+mm}
+					var formatDateEd = dd+'/'+mm+'/'+yyyy;
+					
+					var dlundi = ddimanche;
+					dlundi.setDate(dlundi.getDate() - 6);
+					
+					var dd = dlundi.getDate();
+					var mm = dlundi.getMonth()+1;
+					var yyyy = dlundi.getFullYear();
+					if(dd<10){dd="0"+dd}
+					if(mm<10){mm="0"+mm}
+					var formatDateDb = dd+'/'+mm+'/'+yyyy;					
+
+					var formatDate = formatDateDb + ' - ' + formatDateEd;
+					document.getElementById('ShowCompare').value = formatDate;			
+					break;
+								
+				case "PvYear":
+					var dd = previousYear(setEndWeek()).getDate(); 
+					var mm = previousYear(setEndWeek()).getMonth()+1;
+					var yyyy = previousYear(setEndWeek()).getFullYear();
+					if(dd<10){dd="0"+dd}
+					if(mm<10){mm="0"+mm} 
+					var formatDateEd = dd+'/'+mm+'/'+yyyy;
+
+					var dd = previousYear(setEndWeek()).getDate()-6; 
+					var mm = previousYear(setEndWeek()).getMonth()+1;
+					var yyyy = previousYear(setEndWeek()).getFullYear();
+					if(dd<10){dd="0"+dd}
+					if(mm<10){mm="0"+mm} 
+					var formatDateDb = dd+'/'+mm+'/'+yyyy;
+				
+					var formatDate = formatDateDb + ' - ' + formatDateEd;
+					document.getElementById('ShowCompare').value = formatDate;										
+					break;
+			};
+	    };	    
+	    function getLastMonth(valeurCompare){
+			var dateFirst = new Date().setFirstofMonth();
+			var dd = dateFirst.getDate();
+			var mm = dateFirst.getMonth()+1; 
+			var yyyy = dateFirst.getFullYear();
+			if(dd<10){dd="0"+dd} 
+			if(mm<10){mm="0"+mm} 
+			var formatDateDb = dd+'/'+mm+'/'+yyyy;
+			
+			var dateEnd = new Date().setEndofMonth();
+			var dd = dateEnd.getDate();
+			var mm = dateEnd.getMonth()+1; 
+			var yyyy = dateEnd.getFullYear();
+			if(dd<10){dd="0"+dd} 
+			if(mm<10){mm="0"+mm} 
+			var formatDateEd = dd+'/'+mm+'/'+yyyy;			
+			
+			var formatDate = formatDateDb + ' - ' + formatDateEd;
+			document.getElementById('ShowPeriode').value = formatDate;
+			
+			switch(valeurCompare){
+				case "PvDay":
+					var dFirstCp = new Date().setFirstofMonthCompare();
+					var dd = dFirstCp.getDate();
+					var mm = dFirstCp.getMonth()+1; 
+					var yyyy = dFirstCp.getFullYear();
+					if(dd<10){dd="0"+dd} 
+					if(mm<10){mm="0"+mm} 
+					var formatDateDb = dd+'/'+mm+'/'+yyyy;				
+				
+					var dEndCp = new Date().setEndofMonthCompare();
+					var dd = dEndCp.getDate();
+					var mm = dEndCp.getMonth()+1; 
+					var yyyy = dEndCp.getFullYear();
+					if(dd<10){dd="0"+dd} 
+					if(mm<10){mm="0"+mm} 
+					var formatDateEd = dd+'/'+mm+'/'+yyyy;			
+					
+					var formatDate = formatDateDb + ' - ' + formatDateEd;
+					document.getElementById('ShowCompare').value = formatDate;
+					break;			
+			
+				case "PvYear":
+					var dd = previousYear(dateFirst).getDate(); 
+					var mm = previousYear(dateFirst).getMonth()+1;
+					var yyyy = previousYear(dateFirst).getFullYear();
+					if(dd<10){dd="0"+dd}
+					if(mm<10){mm="0"+mm} 
+					var formatDateDb = dd+'/'+mm+'/'+yyyy;
+
+					var dd = previousYear(dateEnd).getDate(); 
+					var mm = previousYear(dateEnd).getMonth()+1;
+					var yyyy = previousYear(dateEnd).getFullYear();
+					if(dd<10){dd="0"+dd}
+					if(mm<10){mm="0"+mm} 
+					var formatDateEd = dd+'/'+mm+'/'+yyyy;
+				
+					var formatDate = formatDateDb + ' - ' + formatDateEd;
+					document.getElementById('ShowCompare').value = formatDate;
+					break;
+			};
+	    };	  
+	      
+    	//#####################################################################
+	    //				Get right periode in terms of periode selected
+	    //#####################################################################
+		    function getSelectPeriode(){    
+			    //Get the select element
+			    select = document.getElementById("SelectPeriode");
+				valeur = select.options[select.selectedIndex].value;
+				var Editinput = document.getElementById("ShowPeriode");
+				var Editdatepicker = document.getElementById("datepickerPeriode");
+								
+				selectCompare = document.getElementById("SelectCompare");
+				valeurCompare = selectCompare.options[selectCompare.selectedIndex].value;
+
+				//write the date in input
+				switch(valeur){
+					case "Yesterday":
+						Editinput.className= "form-control";
+						Editdatepicker.className= "input-daterange input-group hide";
+						getYesterday(valeurCompare);
+						break;
+					case "Last7days":
+						Editinput.className= "form-control";
+						Editdatepicker.className= "input-daterange input-group hide";
+						getLast7Days(valeurCompare);
+						break;
+					case "Lastweek":
+						Editinput.className= "form-control";
+						Editdatepicker.className= "input-daterange input-group hide";
+						getLastWeek(valeurCompare);
+						break;
+					case "Lastmonth":
+						Editinput.className= "form-control";
+						Editdatepicker.className= "input-daterange input-group hide";
+						getLastMonth(valeurCompare);
+						break;
+					case "Custom":
+						Editinput.className= "form-control hide";
+						Editdatepicker.className= "input-daterange input-group";
+						break;
+				};
+		    };
+//-------------------------------------Date Compare--------------------------------------------------------------------------
+	    //#####################################################################
+	    //						Final Date format Date Compare
+	    //#####################################################################
+		function getPvDay(valeur){
+			switch(valeur){
+				case "Yesterday":
+					var dday = setYesterday();
+					dday.setDate(dday.getDate() - 1);
+					
+					var dd = dday.getDate();
+					var mm = dday.getMonth()+1;
+					var yyyy = dday.getFullYear();
+					if(dd<10){dd="0"+dd}
+					if(mm<10){mm="0"+mm}
+					var formatDate = dd+'/'+mm+'/'+yyyy;
+					document.getElementById('ShowCompare').value = formatDate;
+					break;
+					
+				case "Last7days":
+					//dday = yesterday - 1
+					var dday = setLast7Days();
+					dday.setDate(dday.getDate() - 1);
+					var dd = dday.getDate();
+					var mm = dday.getMonth()+1;
+					var yyyy = dday.getFullYear();
+					if(dd<10){dd="0"+dd}
+					if(mm<10){mm="0"+mm}
+					var formatDateEd = dd+'/'+mm+'/'+yyyy;
+					
+					//dday-7
+					var dday7 = dday;
+					dday7.setDate(dday.getDate() - 6);
+					
+					var dd = dday7.getDate();
+					var mm = dday7.getMonth()+1;
+					var yyyy = dday7.getFullYear();
+					if(dd<10){dd="0"+dd}
+					if(mm<10){mm="0"+mm}
+					var formatDateDb = dd+'/'+mm+'/'+yyyy;
+								
+					var formatDate = formatDateDb + ' - ' + formatDateEd;
+					document.getElementById('ShowCompare').value = formatDate;
+					break;
+					
+				case "Lastweek":
+					var ddimanche = setEndWeek();
+					ddimanche.setDate(ddimanche.getDate() - 7);
+					
+					var dd = ddimanche.getDate();
+					var mm = ddimanche.getMonth()+1;
+					var yyyy = ddimanche.getFullYear();
+					if(dd<10){dd="0"+dd}
+					if(mm<10){mm="0"+mm}
+					var formatDateEd = dd+'/'+mm+'/'+yyyy;
+					
+					var dlundi = ddimanche;
+					dlundi.setDate(dlundi.getDate() - 6);
+					
+					var dd = dlundi.getDate();
+					var mm = dlundi.getMonth()+1;
+					var yyyy = dlundi.getFullYear();
+					if(dd<10){dd="0"+dd}
+					if(mm<10){mm="0"+mm}
+					var formatDateDb = dd+'/'+mm+'/'+yyyy;					
+
+					var formatDate = formatDateDb + ' - ' + formatDateEd;
+					document.getElementById('ShowCompare').value = formatDate;	
+					break;
+					
+				case "Lastmonth":
+					var dateFirst = new Date().setFirstofMonthCompare();
+					var dd = dateFirst.getDate();
+					var mm = dateFirst.getMonth()+1; 
+					var yyyy = dateFirst.getFullYear();
+					if(dd<10){dd="0"+dd} 
+					if(mm<10){mm="0"+mm} 
+					var formatDateDb = dd+'/'+mm+'/'+yyyy;				
+				
+					var dateEnd = new Date().setEndofMonthCompare();
+					var dd = dateEnd.getDate();
+					var mm = dateEnd.getMonth()+1; 
+					var yyyy = dateEnd.getFullYear();
+					if(dd<10){dd="0"+dd} 
+					if(mm<10){mm="0"+mm} 
+					var formatDateEd = dd+'/'+mm+'/'+yyyy;			
+					
+					var formatDate = formatDateDb + ' - ' + formatDateEd;
+					document.getElementById('ShowCompare').value = formatDate;
+					break;
+			};
+		};
+		function getPvYear(valeur){
+			switch(valeur){
+				case "Yesterday":
+					var dd = previousYear(setYesterday()).getDate(); 
+					var mm = previousYear(setYesterday()).getMonth()+1;
+					var yyyy = previousYear(setYesterday()).getFullYear();
+					if(dd<10){dd="0"+dd} 
+					if(mm<10){mm="0"+mm} 
+					var formatDate = dd+'/'+mm+'/'+yyyy;
+					
+					document.getElementById('ShowCompare').value = formatDate;
+					break;
+			
+				case "Last7days":
+					var dd = previousYear(setYesterday()).getDate(); 
+					var mm = previousYear(setYesterday()).getMonth()+1;
+					var yyyy = previousYear(setYesterday()).getFullYear();
+					if(dd<10){dd="0"+dd}
+					if(mm<10){mm="0"+mm} 
+					var formatDateEd = dd+'/'+mm+'/'+yyyy;
+
+					var dd = previousYear(setLast7Days()).getDate(); 
+					var mm = previousYear(setLast7Days()).getMonth()+1;
+					var yyyy = previousYear(setLast7Days()).getFullYear();
+					if(dd<10){dd="0"+dd}
+					if(mm<10){mm="0"+mm} 
+					var formatDateDb = dd+'/'+mm+'/'+yyyy;
+				
+					var formatDate = formatDateDb + ' - ' + formatDateEd;
+					document.getElementById('ShowCompare').value = formatDate;										
+					break;
+					
+				case "Lastweek":
+					var dd = previousYear(setEndWeek()).getDate(); 
+					var mm = previousYear(setEndWeek()).getMonth()+1;
+					var yyyy = previousYear(setEndWeek()).getFullYear();
+					if(dd<10){dd="0"+dd}
+					if(mm<10){mm="0"+mm} 
+					var formatDateEd = dd+'/'+mm+'/'+yyyy;
+
+					var dd = previousYear(setEndWeek()).getDate()-6; 
+					var mm = previousYear(setEndWeek()).getMonth()+1;
+					var yyyy = previousYear(setEndWeek()).getFullYear();
+					if(dd<10){dd="0"+dd}
+					if(mm<10){mm="0"+mm} 
+					var formatDateDb = dd+'/'+mm+'/'+yyyy;
+				
+					var formatDate = formatDateDb + ' - ' + formatDateEd;
+					document.getElementById('ShowCompare').value = formatDate;										
+					break;	
+					
+				case "Lastmonth":
+					var dateFirst = new Date().setFirstofMonth();
+					var dd = previousYear(dateFirst).getDate(); 
+					var mm = previousYear(dateFirst).getMonth()+1;
+					var yyyy = previousYear(dateFirst).getFullYear();
+					if(dd<10){dd="0"+dd}
+					if(mm<10){mm="0"+mm} 
+					var formatDateDb = dd+'/'+mm+'/'+yyyy;
+	
+					var dateEnd = new Date().setEndofMonth();
+					var dd = previousYear(dateEnd).getDate(); 
+					var mm = previousYear(dateEnd).getMonth()+1;
+					var yyyy = previousYear(dateEnd).getFullYear();
+					if(dd<10){dd="0"+dd}
+					if(mm<10){mm="0"+mm} 
+					var formatDateEd = dd+'/'+mm+'/'+yyyy;
+				
+					var formatDate = formatDateDb + ' - ' + formatDateEd;
+					document.getElementById('ShowCompare').value = formatDate;
+					break;		
+			};
+		};
+    	//#####################################################################
+	    //				Get right periode in terms of compare selected
+	    //#####################################################################
+		    function getSelectCompare(){    
+			    //Get the select element
+			    select = document.getElementById("SelectPeriode");
+				valeur = select.options[select.selectedIndex].value;
+				
+				selectCompare = document.getElementById("SelectCompare");
+				valeurCompare = selectCompare.options[selectCompare.selectedIndex].value;
+				var EditinputCompare = document.getElementById("ShowCompare");
+				var EditdatepickerCompare = document.getElementById("datepickerCompare");
+
+				//write the date in input
+				switch(valeurCompare){
+					case "PvDay":
+						EditinputCompare.className= "form-control";
+						EditdatepickerCompare.className= "input-daterange input-group hide";
+						getPvDay(valeur);
+						break;
+					case "PvYear":
+						EditinputCompare.className= "form-control";
+						EditdatepickerCompare.className= "input-daterange input-group hide";
+						getPvYear(valeur);
+						break;
+					case "Custom":
+						EditinputCompare.className= "form-control hide";
+						EditdatepickerCompare.className= "input-daterange input-group";
+						break;
+				};
+		    };		
+		
+    //----------------------------------END Date--------------------------------------
     
   </script>
   
@@ -237,30 +642,105 @@
 
 	<div class="jumbotron">
 		<div class="container">
-		<p><form class="form-horizontal" role="form" method="post" action="#">
-			<div class="form-group">
-				<div class="col-xs-1" style="height:34px"><h4>Periode </h4></div>
-				<div class="col-xs-4">
-					<div class="input-group">
-				      <div class="input-group-btn">
-				        <select id="SelectPeriode" class="selectpicker" data-width="120px" onchange="getSelectPeriode();">
-				          <option value="Yesterday" Selected>Yesterday</option>
-				          <option value="Last7days">Last 7 days</option>
-				          <option value="Lastweek">Last week</option>
-				          <option value="Lastmonth">Last month</option>
-				          <option data-divider="true"></option>
-				          <option value="Custom" onchange="formCustom();">Custom</option>
-				          
-					    </select>       
-				      </div><!-- End input-group-btn -->
-				      <input type="text" class="form-control" id="ShowPeriode" readonly="true" >
-				    </div><!-- End input-group -->
-				</div><!-- End col-xs-5 -->
-			</div><!-- End form-group -->
-	    </form></p>
+			<div class="row" style="margin-top:10px;margin-bottom:10px">
+				<div class="col-md-5">		
+					<div class="col-xs-2"><h4>Periode </h4></div>
+					<div class="col-xs-4" id="sandbox-container">
+						<div class="input-group">
+					      <div class="input-group-btn">
+					        <select class="selectpicker" id="SelectPeriode" data-width="135px" onchange="getSelectPeriode();">
+					          <option value="Yesterday">Yesterday</option>
+					          <option value="Last7days">Last 7 days</option>
+					          <option value="Lastweek">Last week</option>
+					          <option value="Lastmonth">Last month</option>
+					          <option data-divider="true"></option>
+					          <option value="Custom">Custom</option>
+						    </select>   
+					      </div><!-- End input-group-btn -->
+		
+					      <input type="text" class="form-control" style="width:190px" id="ShowPeriode" readonly="true" >
+		
+					      <div class="input-daterange hide" id="datepickerPeriode" style="width:250px; top:2px">
+						    <input type="text" class="input-sm form-control" name="dtpStartPeriode" id="dtpStartPeriode"/>
+						    <span class="input-group-addon">to</span>
+						    <input type="text" class="input-sm form-control" name="dtpEndPeriode" id="dtpEndPeriode"/>
+							    <script type="text/javascript">
+									$('#dtpStartPeriode').datepicker({
+									    startDate: "01/01/2014",
+									    language: "fr",
+									    multidate: false,
+									    todayHighlight: true,
+									    autoclose: true,
+									})
+									    .on('changeDate', function(selected){
+									        startDate = new Date(selected.date.valueOf());
+									        startDate.setDate(startDate.getDate(new Date(selected.date.valueOf())));
+									        $('#dtpEndPeriode').datepicker('setStartDate', startDate);
+									    }); 
+									$('#dtpEndPeriode').datepicker({
+									    language: "fr",
+									    multidate: false,
+									    todayHighlight: true,
+									    autoclose: true,
+									});
+								</script>
+						  </div><!-- End input-daterange -->
+					    </div><!-- End input-group -->
+					</div><!-- End col-xs-4 -->
+				</div><!-- End col-md-6 -->
+						
+				<div class="col-md-5">
+					<div class="col-xs-2" style="width:90px"><h4>Compare </h4></div>
+					<div class="col-xs-4" id="sandbox-container">
+						<div class="input-group">
+					      <div class="input-group-btn">
+					        <select class="selectpicker" id="SelectCompare" data-width="135px" onchange="getSelectCompare();">
+					          <option value="PvDay">Previous day</option>
+					          <option value="PvYear">Previous year</option>
+					          <option data-divider="true"></option>
+					          <option value="Custom">Custom</option>
+						    </select>       
+					      </div><!-- End input-group-btn -->
+					      
+					      <input type="text" class="form-control"  style="width:190px" id="ShowCompare" readonly="true" >
+					      
+					      <div class="input-daterange hide" id="datepickerCompare" style="width:250px; top:2px">
+						    <input type="text" class="input-sm form-control" name="dtpStartCompare" id="dtpStartCompare"/>
+						    <span class="input-group-addon">to</span>
+						    <input type="text" class="input-sm form-control" name="dtpEndCompare" id="dtpEndCompare"/>
+							  	<script type="text/javascript">
+										$('#dtpStartCompare').datepicker({
+										    startDate: "01/01/2014",
+										    language: "fr",
+										    multidate: false,
+										    todayHighlight: true,
+										    autoclose: true,
+										})
+										    .on('changeDate', function(selected){
+										        startDate = new Date(selected.date.valueOf());
+										        startDate.setDate(startDate.getDate(new Date(selected.date.valueOf())));
+										        $('#dtpEndCompare').datepicker('setStartDate', startDate);
+										    }); 
+										$('#dtpEndCompare').datepicker({
+										    language: "fr",
+										    multidate: false,
+										    todayHighlight: true,
+										    autoclose: true,
+										});
+								</script>
+						  </div><!-- End input-daterange -->
+					    </div><!-- End input-group -->
+					</div><!-- End col-xs-4 -->
+				</div><!-- End col-md-6 -->
+				
+				<div class="col-md-2" style="padding-left:50px">	
+					<div class="btn-group" role="group"><button type="button" class="btn btn-default" style="width:80px">Apply</button></div>
+				</div>
+				
+			</div><!-- End Row -->
 		</div><!-- End container -->
 	</div><!-- End jumbotron -->
-    </nav>    
+</nav>    
     
     
    <!-- Content -->
@@ -287,16 +767,7 @@
     </div>
     
     
-        <!-- Bootstrap core JavaScript
-    ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-    <script src="/js/bootstrap.min.js"></script>
-    <script src="/js/bootstrap-select.js"></script>
-    <script src="/js/bootstrap-select.min.js"></script>
-    <script src="/assets/js/docs.min.js"></script>
-    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    <script src="/assets/js/ie10-viewport-bug-workaround.js"></script>
+
     
 </body>
 </html>

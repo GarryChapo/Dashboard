@@ -22,7 +22,7 @@ decorator = oauth2decorator_from_clientsecrets(
 
 # Common value for Query
 BILLING_PROJECT_ID = "1011003757378"
-WHERE = "where (Impression > 0) "
+WHERE = "where (Impression > 0) " 
 
 #Query Country Line Graph
 SELECTCTLINE = "SELECT Date,Country,Sum(Impression) as Imp,Sum( Clicks) as Clicks,Round(Sum(Sum(Clicks)/Sum(Impression))*100,2) as CTR,Round(Sum(sum(Posimp)/Imp),2) as AvgPos,Round(Sum(Sum(Cost)/Sum(Clicks)),2) as CPC,Round(Sum(Cost),2) as Costs,Sum(AdWordsConversions) as ConvAdw,Sum(DFATransactions) as Sales,Sum(DFAActions) as Optin,Round(Sum(Sum(DFATransactions)/Sum(Clicks))*100,2) as CVRSales,Round(Sum(Sum(DFAActions)/Sum(Clicks))*100,2) as CVROptin,Round(Sum(Revenu),2) as CA,Round(Sum(Sum(Cost)/Sum(Revenu))*100,2) as TxDistri,Round(Sum(sum(Revenu)/sum(DFATransactions)),2) as AvgBasket "
@@ -40,7 +40,6 @@ QRCountryTab = SELECTCTTAB + FROMCTTAB + WHERE + GROUPBYCTTAB + ORDERBYCTTAB
 
 mem = memcache.Client()
 
-
 class MainPage(webapp2.RequestHandler):
     
     @staticmethod
@@ -49,7 +48,7 @@ class MainPage(webapp2.RequestHandler):
             return float(value)
         else:
             return None
-        
+    
     #------------------ Country-----------------------------    
     def _CountryLine(self, bqCountryLine):
         # get data from query
@@ -71,6 +70,7 @@ class MainPage(webapp2.RequestHandler):
         CA = bqCountryLine["schema"]["fields"][13]["name"]
         TxDistri = bqCountryLine["schema"]["fields"][14]["name"]
         AvgBasket = bqCountryLine["schema"]["fields"][15]["name"]
+        
         
         #create tab and attribute column with data
         tabCountryLine.add_column(Date, unicode, Date) 
